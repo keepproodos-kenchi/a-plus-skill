@@ -24,6 +24,7 @@ description: Use when building, hardening, reviewing or grading software for pro
 | `standard/04-project-profile-template.md` | Creating or updating a profile |
 | `standard/05-agent-execution-contract.md` | Briefs, reports, gap and review formats |
 | `standard/06-stack-bindings.md` | Choosing how to meet a control in this stack |
+| `standard/07-reference-layouts.md` | Where files go in FastAPI or Next.js (or Vite) apps, the architecture test that enforces it, observability module layout |
 
 ## Modes
 
@@ -45,7 +46,8 @@ description: Use when building, hardening, reviewing or grading software for pro
 | "This control is unmet" (for tenancy, rate limits, money, store releases…) | Check the predicate against the context first (X-12). |
 | "Single-owner / local tool, so the bar is lower" | The bar is the same. Only applicability changes, and only by a stated fact. Structure, testing, observability, secrets and supply chain apply to everything. |
 | "Mark it N/A, it is a lot of work" | N/A needs a context fact. Effort is a gap with an owner, never an N/A. |
-| "Reorganise into the standard's layout" | The framework's layout comes first (`03-playbook-service.md` §1 map). Enforce one declared structure, don't import another ecosystem's. |
+| "Reorganise into the standard's layout" | The framework's layout comes first (`03-playbook-service.md` §1 map). Enforce one declared structure, don't import another ecosystem's. `07-reference-layouts.md` is a target only where no structure is declared, or for the parts that are missing. |
+| "Add OpenTelemetry / Sentry / Grafana for observability" | Start from the logging module and framework hooks already present (`07` §4). Backends come with a verified destination, not before. |
 | "Tests should pass" / "looks secure" | Run the command, read the exit code, cite it. |
 
 ## Rules for edge cases

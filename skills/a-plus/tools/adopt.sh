@@ -120,7 +120,7 @@ fi
 if [ "$copy_layers" -eq 1 ]; then
   run mkdir -p "$target"
   for f in 01-constitution.md 02-context-risk-and-policies.md 04-project-profile-template.md \
-           05-agent-execution-contract.md 06-stack-bindings.md README.md CHANGELOG.md VERSION $playbooks; do
+           05-agent-execution-contract.md 06-stack-bindings.md 07-reference-layouts.md README.md CHANGELOG.md VERSION $playbooks; do
     run cp "$SRC/$f" "$target/$f"
   done
   say "copied layer files"

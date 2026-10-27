@@ -18,8 +18,11 @@ ecosystem tools. A tool listed for one ecosystem is never a recommendation for a
 | Boundary parsing (C-02) | FastAPI: pydantic request/response models and `response_model`; Django: forms, DRF serializers; plain: pydantic, `attrs` + `cattrs`, `msgspec`, dataclasses plus explicit checks |
 | Config fail-closed (C-06, B-19) | pydantic-settings; Django settings module with explicit checks at startup; a typed dataclass loaded and validated in `main` |
 | Canonical schema and contract (P-C2) | FastAPI's generated OpenAPI document; drf-spectacular; contract tests with Schemathesis against the OpenAPI document |
-| Structured logs and errors (C-15, P-O1) | stdlib `logging` with a JSON formatter; `structlog`; FastAPI exception handlers mapping to the error registry |
-| Structure check (C-16) | `import-linter` contracts; package-private modules (leading underscore); Django apps as module units |
+| Structured logs and errors (C-15, P-O1) | stdlib `logging` with a JSON formatter behind a bounded queue and one writer; `structlog`; FastAPI exception handlers mapping to the error registry |
+| Correlation and tracing (P-O3, B-8) | `contextvars` request id set by an outer ASGI middleware; OpenTelemetry API/SDK with W3C `traceparent` propagation to outbound `httpx` calls; `opentelemetry-instrumentation-fastapi` if locked |
+| Metrics (P-O7) | OpenTelemetry metrics SDK with explicit histogram buckets and bounded attribute keys; `prometheus-client` only if already used |
+| Health (B-22) | plain `APIRouter` liveness and readiness routes with bounded, read-only dependency checks |
+| Structure check (C-16) | an AST architecture test in the pytest suite (stdlib `ast`, see `07` §2.3); `import-linter` contracts; package-private modules (leading underscore); Django apps as module units |
 | Lint, format, types (P-M5) | `ruff check`, `ruff format`; `mypy --strict` or `pyright` strict |
 | Tests (P-Q2) | `pytest`, `pytest-asyncio`, `hypothesis` for properties; FastAPI `TestClient` or `httpx.AsyncClient` with ASGI transport; Django test client |
 | Data and migrations (P-D1, P-D3) | SQLAlchemy plus Alembic; Django ORM migrations; stdlib `sqlite3` with versioned migration scripts |
@@ -35,8 +38,10 @@ ecosystem tools. A tool listed for one ecosystem is never a recommendation for a
 | Boundary parsing (C-02) | NestJS: `ValidationPipe` with class-validator DTOs; Fastify: route JSON schemas (Ajv); Next.js server actions and route handlers: the schema library already in the repo; clients of the project's own API: types generated from its OpenAPI (`openapi-typescript`, `orval`) plus a contract check; a schema library (zod, valibot, typebox) only if already used or approved |
 | Config fail-closed (C-06) | NestJS `ConfigModule` with a validation schema; one `env` module that parses `process.env` at startup; Vite: only `VITE_`-prefixed public values in the client |
 | Canonical schema and contract (P-C2) | `@nestjs/swagger` OpenAPI; a shared `contracts` workspace package; server's OpenAPI consumed by generated types |
-| Structured logs and errors (C-15) | NestJS `Logger` or `nestjs-pino`; `pino`; framework exception filters or error boundaries |
-| Structure check (C-16) | `eslint-plugin-boundaries`, `dependency-cruiser`, `eslint-plugin-import` `no-restricted-paths`; package `exports` maps; Nx or Turbo project boundaries |
+| Structured logs and errors (C-15) | NestJS `Logger` or `nestjs-pino`; `pino`; framework exception filters or error boundaries; browser: one allow-listed `logEvent` module plus global `error`/`unhandledrejection` listeners |
+| Observability, Next.js (P-O1, P-O3) | `instrumentation.ts` `register()` and `onRequestError`; `instrumentation-client.ts` for browser errors; `middleware.ts` for request ids; `app/error.tsx` and `global-error.tsx`; `@vercel/otel` or the OpenTelemetry Node SDK only if locked or approved |
+| Server/client boundary (W-3) | Next.js: `import "server-only"` in server modules and a `server.ts` feature interface; only `NEXT_PUBLIC_` values in client code; a bundle secret scan in the gate |
+| Structure check (C-16) | an import-graph architecture test in the Vitest/Jest suite (see `07` §3.2 R-N7); `eslint-plugin-boundaries`, `dependency-cruiser`, `eslint-plugin-import` `no-restricted-paths`; package `exports` maps; Nx or Turbo project boundaries |
 | Lint, format, types (P-M5) | ESLint (typescript-eslint) or Biome; Prettier or Biome; `tsc --noEmit` with `strict` |
 | Tests (P-Q2) | Vitest or Jest; Testing Library; Playwright for e2e; `@axe-core/playwright` for accessibility; Supertest or the framework's test app for services |
 | Server state (W-5) | TanStack Query, SWR, RTK Query, or the framework's loaders, whichever the app uses |

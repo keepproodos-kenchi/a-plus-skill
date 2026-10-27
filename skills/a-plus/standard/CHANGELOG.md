@@ -1,5 +1,25 @@
 # Changelog — A+ Engineering Standard
 
+## 2.1.0 — 2026-10-27
+
+Adds concrete file and folder structure, distilled from a reviewed FastAPI + React modular
+monolith whose layout is enforced by tests. No control ids change.
+
+- New `07-reference-layouts.md`: repository layout with `api/` (FastAPI) and `frontend/`
+  (Next.js) at the root plus optional `contracts/`, `infra/`, `docs/`; shared slice rules
+  `R-1`…`R-9`; FastAPI tree (composition files at the package root, feature-owned
+  router/schemas/service/repository/domain/adapters, `platform/`, `shared/`) and rules
+  `R-F1`…`R-F7` with a stdlib AST architecture test; Next.js App Router tree and rules
+  `R-N1`…`R-N8` (thin `app/`, client `index.ts` and `server-only` `server.ts` per feature,
+  `data/` layer, single `platform/http.ts` transport and env modules, import-graph test);
+  observability module layouts for FastAPI and Next.js, rules `R-O1`…`R-O10`,
+  infrastructure tree and phases, review checklist.
+- Service playbook §1 and B-23, web playbook W-1a point to the reference layouts.
+- Stack bindings: Python correlation/tracing, metrics and health rows; Next.js
+  observability and server/client boundary rows; architecture tests as the no-dependency
+  structure check.
+- `adopt.sh` copies the new layer; SKILL.md lists it and adds an observability red flag.
+
 ## 2.0.0 — 2026-10-26
 
 Makes the standard follow each project's stack and context instead of assuming one product

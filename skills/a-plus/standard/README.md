@@ -1,4 +1,4 @@
-# A+ Engineering Standard (generic, v2.0)
+# A+ Engineering Standard (generic, v2.1)
 
 A stack-agnostic standard for building and reviewing production-ready, enterprise-grade
 software (services, web and mobile clients, libraries and CLIs, pipelines and AI features)
@@ -19,6 +19,7 @@ apply, and the project's own stack decides how each is met.
 | `04-project-profile-template.md` | 4. Template for the project profile | **Copy and fill** |
 | `05-agent-execution-contract.md` | 5. Agent rules `X-1`…`X-12`, brief, report, gap and finding formats, reviewer checklist | No |
 | `06-stack-bindings.md` | 6. Example native bindings per ecosystem (examples, never requirements) | No |
+| `07-reference-layouts.md` | 7. Reference FastAPI and Next.js trees, architecture tests, observability layout (reference, not mandate) | No |
 
 Change log: `CHANGELOG.md`. Version: `VERSION`.
 

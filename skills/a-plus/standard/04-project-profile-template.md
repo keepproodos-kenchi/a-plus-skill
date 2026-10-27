@@ -14,7 +14,7 @@ Copy this file to the repository's rules folder, fill every section, date it, ke
 | --- | --- | --- |
 | Repository | | |
 | Profile version and date | | |
-| Standard version adopted | v2.0 | `<dest>/a-plus/VERSION` |
+| Standard version adopted | v2.1 | `<dest>/a-plus/VERSION` |
 | Accountable owners | engineering · security · product · operations (one person may hold several) | |
 | Risk owner for exceptions | | |
 

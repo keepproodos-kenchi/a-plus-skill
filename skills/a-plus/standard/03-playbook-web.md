@@ -11,6 +11,7 @@ Remix, Astro islands) and installable PWAs. Binds to Layer 1 and 2 controls. Row
 | --- | --- | --- |
 | W-1 | | Feature-sliced modules: each feature owns its API calls, domain rules, hooks or stores, components, screens and tests behind a public index; routes or pages are thin. Cross-feature imports only through public indexes; the feature graph is acyclic and checked (C-16). Follow the framework's routing convention (file-based `app/` or `pages/`, or a router config) for where routes live. |
 | W-2 | | A platform layer (HTTP client, telemetry, i18n, storage, auth session) never imports features. |
+| W-1a | | Reference trees for Next.js App Router and Vite SPAs, with the architecture test that enforces them and the client/server observability layout, are in `07-reference-layouts.md` §3 and §4.2. |
 | W-3 | the framework renders on a server, or any secret exists | Server-only modules and secrets never reach the client bundle; the build fails on violation (for example `server-only` imports in Next.js, `.server` modules in Remix and SvelteKit). For a static SPA: the bundle contains no secret, only public configuration, checked in the gate. |
 
 ## 2. Data and state

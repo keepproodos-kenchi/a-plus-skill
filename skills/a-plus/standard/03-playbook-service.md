@@ -27,6 +27,10 @@ import another ecosystem's layout. These are the usual mappings, not mandates:
 | Go | package per feature under `internal/` | `http.Handler`s | service type | domain package | store and client packages |
 | Spring | package or module per feature | `@RestController` | `@Service` | entities without persistence logic, value objects | `@Repository`, clients |
 
+A complete FastAPI tree (composition, `features/`, `platform/`, `shared/`), its enforcing
+architecture test and the `platform/observability/` module layout are in
+`07-reference-layouts.md` §2 and §4.1.
+
 ## 2. Request lifecycle
 
 | Id | Applies when | Rule |
@@ -69,7 +73,7 @@ import another ecosystem's layout. These are the usual mappings, not mandates:
 | Id | Applies when | Rule |
 | --- | --- | --- |
 | B-22 | | Liveness and readiness endpoints; readiness checks the stores and services the process depends on and reports partial states honestly (P-R4). |
-| B-23 | | Structured logging with event types; metrics or counters for limits, queues, caches and external calls (P-O7); detection disposition per new failure mode (P-O2). |
+| B-23 | | Structured logging with event types; metrics or counters for limits, queues, caches and external calls (P-O7); detection disposition per new failure mode (P-O2). Rules R-O1–R-O10 in `07-reference-layouts.md` §4 show one complete binding. |
 | B-24 | | Graceful shutdown drains in-flight requests and jobs within the platform's stop timeout. |
 
 ## 7. Tests the service owes
