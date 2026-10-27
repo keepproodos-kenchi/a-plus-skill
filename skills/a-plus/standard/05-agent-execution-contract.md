@@ -91,6 +91,7 @@ A review lists findings, most severe first, each in this shape:
 
 ```
 [<Blocker|Major|Minor|Note>] <control id> — <file:line>
+Class: <verified defect | risk requiring evidence | optional improvement>
 Applies because: <context fact or "always">
 Observed: <what the code or command output shows>
 Impact: <concrete failure: input or state → wrong outcome>
@@ -99,8 +100,11 @@ Fix (native): <change using the repository's existing mechanism (X-11)>
 
 Severity: **Blocker** = applicable P0 or non-waivable control unmet, or a defect with a
 concrete exploit or data-loss path; **Major** = applicable MUST unmet; **Minor** = SHOULD or
-P1 unmet; **Note** = consistency or maintainability observation. After the findings, report
-the three axes (Layer 2 §3) separately.
+P1 unmet; **Note** = consistency or maintainability observation. **Class:** a *verified
+defect* has evidence of a broken control; a *risk requiring evidence* names the check that
+would settle it; an *optional improvement* is never above Minor. An *acceptable alternative*
+(a different layout or mechanism with the same properties) is not a finding: record it in the
+profile. After the findings, report the three axes (Layer 2 §3) separately.
 
 **Checklist** — confirm each applicable item with evidence; mark the rest N/A with the fact:
 

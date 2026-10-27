@@ -22,7 +22,7 @@ ecosystem tools. A tool listed for one ecosystem is never a recommendation for a
 | Correlation and tracing (P-O3, B-8) | `contextvars` request id set by an outer ASGI middleware; OpenTelemetry API/SDK with W3C `traceparent` propagation to outbound `httpx` calls; `opentelemetry-instrumentation-fastapi` if locked |
 | Metrics (P-O7) | OpenTelemetry metrics SDK with explicit histogram buckets and bounded attribute keys; `prometheus-client` only if already used |
 | Health (B-22) | plain `APIRouter` liveness and readiness routes with bounded, read-only dependency checks |
-| Structure check (C-16) | an AST architecture test in the pytest suite (stdlib `ast`, see `07` §2.3); `import-linter` contracts; package-private modules (leading underscore); Django apps as module units |
+| Structure check (C-16) | an AST architecture test in the pytest suite (stdlib `ast` with negative fixtures, see `07` §2.3, R-10); `import-linter` contracts; package-private modules (leading underscore); Django apps as module units |
 | Lint, format, types (P-M5) | `ruff check`, `ruff format`; `mypy --strict` or `pyright` strict |
 | Tests (P-Q2) | `pytest`, `pytest-asyncio`, `hypothesis` for properties; FastAPI `TestClient` or `httpx.AsyncClient` with ASGI transport; Django test client |
 | Data and migrations (P-D1, P-D3) | SQLAlchemy plus Alembic; Django ORM migrations; stdlib `sqlite3` with versioned migration scripts |
@@ -39,9 +39,9 @@ ecosystem tools. A tool listed for one ecosystem is never a recommendation for a
 | Config fail-closed (C-06) | NestJS `ConfigModule` with a validation schema; one `env` module that parses `process.env` at startup; Vite: only `VITE_`-prefixed public values in the client |
 | Canonical schema and contract (P-C2) | `@nestjs/swagger` OpenAPI; a shared `contracts` workspace package; server's OpenAPI consumed by generated types |
 | Structured logs and errors (C-15) | NestJS `Logger` or `nestjs-pino`; `pino`; framework exception filters or error boundaries; browser: one allow-listed `logEvent` module plus global `error`/`unhandledrejection` listeners |
-| Observability, Next.js (P-O1, P-O3) | `instrumentation.ts` `register()` and `onRequestError`; `instrumentation-client.ts` for browser errors; `middleware.ts` for request ids; `app/error.tsx` and `global-error.tsx`; `@vercel/otel` or the OpenTelemetry Node SDK only if locked or approved |
+| Observability, Next.js (P-O1, P-O3) | check the installed `next` version first; `instrumentation.ts` `register()` and `onRequestError`; `instrumentation-client.ts` for browser errors (15.3+); `proxy.ts` (16+) or `middleware.ts` (earlier) for request ids; `app/error.tsx` and `global-error.tsx`; `@vercel/otel` or the OpenTelemetry Node SDK only if locked or approved |
 | Server/client boundary (W-3) | Next.js: `import "server-only"` in server modules and a `server.ts` feature interface; only `NEXT_PUBLIC_` values in client code; a bundle secret scan in the gate |
-| Structure check (C-16) | an import-graph architecture test in the Vitest/Jest suite (see `07` §3.2 R-N7); `eslint-plugin-boundaries`, `dependency-cruiser`, `eslint-plugin-import` `no-restricted-paths`; package `exports` maps; Nx or Turbo project boundaries |
+| Structure check (C-16) | an import-graph architecture test in the Vitest/Jest suite that resolves `tsconfig` path aliases (see `07` §3.2 R-N7); `eslint-plugin-boundaries`, `dependency-cruiser`, `eslint-plugin-import` `no-restricted-paths`; package `exports` maps; Nx or Turbo project boundaries |
 | Lint, format, types (P-M5) | ESLint (typescript-eslint) or Biome; Prettier or Biome; `tsc --noEmit` with `strict` |
 | Tests (P-Q2) | Vitest or Jest; Testing Library; Playwright for e2e; `@axe-core/playwright` for accessibility; Supertest or the framework's test app for services |
 | Server state (W-5) | TanStack Query, SWR, RTK Query, or the framework's loaders, whichever the app uses |

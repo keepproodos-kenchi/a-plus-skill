@@ -1,4 +1,4 @@
-# A+ Engineering Standard (generic, v2.1)
+# A+ Engineering Standard (generic, v2.2)
 
 A stack-agnostic standard for building and reviewing production-ready, enterprise-grade
 software (services, web and mobile clients, libraries and CLIs, pipelines and AI features)

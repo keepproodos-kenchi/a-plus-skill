@@ -1,5 +1,34 @@
 # Changelog — A+ Engineering Standard
 
+## 2.2.0 — 2026-10-27
+
+Makes `07-reference-layouts.md` strict about properties and flexible about paths, after an
+architecture review of the reference layouts. Rule ids in `07` were renumbered; constitution,
+policy and playbook ids are unchanged.
+
+- `07` §0: every rule marked MUST / SHOULD / MAY; trees are illustrative (R-0a); no migration
+  of passing code without a demonstrated problem (R-0b); missing optional folders are never
+  findings (R-0c); structure findings are classified (R-0d).
+- Repository layout: `api/` + `frontend/` stay the example; `apps/<name>/`, `packages/`,
+  `services/`, `backend/` and single-app roots are accepted alternatives; `src/` is a source
+  root, never the application name.
+- Invariants: ownership (R-2); public contracts may be `public.py` / `contracts.py` instead of
+  barrels (R-3); ports only where they isolate a consequential choice (R-6); namespaced
+  features `features/<namespace>/<feature>/` and bounded-context sub-modules (R-7); the
+  boundary checker must resolve the repo's import forms, report unresolvable ones and prove
+  itself with negative fixtures (R-10). Folder allowlists become optional.
+- FastAPI: `api/` composition package and root composition files are both valid; catch-all
+  `/api` 404 only when the API also serves the frontend (R-F7).
+- Next.js: read the installed version first (`proxy.ts` from 16, `middleware.ts` before;
+  `instrumentation-client.ts` from 15.3); no barrel mixing server and client exports; Edge
+  isolation; the boundary check must resolve `@/` path aliases (the previous relative-only
+  scanner let alias imports bypass every rule); feature flags never authorise.
+- Observability: signal table, one primary error pipeline, `NEXT_RUNTIME`-aware
+  `instrumentation.ts`, server/client split under `platform/observability/`, optional product
+  analytics in `platform/analytics/` kept separate from operational telemetry.
+- `05` §5 findings carry a `Class`; acceptable alternatives are recorded in the profile.
+- SKILL.md: red flag against folder-name findings.
+
 ## 2.1.0 — 2026-10-27
 
 Adds concrete file and folder structure, distilled from a reviewed FastAPI + React modular
