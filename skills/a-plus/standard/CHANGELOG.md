@@ -1,5 +1,22 @@
 # Changelog — A+ Engineering Standard
 
+## 2.3.0 — 2026-11-04
+
+Expands the FastAPI and Next.js feature layouts and clarifies their runtime and ownership
+boundaries. Existing folder conventions remain accepted; no control ids change.
+
+- FastAPI: lightweight package initializers, separate public business contracts and router
+  entrypoints, explicit lifespan ownership, and feature-owned unit/integration tests.
+- Next.js: concrete cart layout, client-safe and server-only public interfaces, optional
+  callable Server Actions, server screens and client interaction, draft storage, and
+  separate browser/server transport entrypoints when needed.
+- Paired deployments declare authoritative persistence ownership; Next.js server adapters
+  do not duplicate FastAPI-owned writes. Standalone Next.js persistence remains supported.
+- Reconciles inert ASGI construction with import checks, allows framework runtime selectors
+  in instrumentation, and corrects the version guidance for Node.js middleware.
+- Accepts feature-local `__tests__/` alongside colocated tests; adds placement guidance,
+  boundary-check expectations for Server Actions, and official framework references.
+
 ## 2.2.0 — 2026-10-27
 
 Makes `07-reference-layouts.md` strict about properties and flexible about paths, after an
