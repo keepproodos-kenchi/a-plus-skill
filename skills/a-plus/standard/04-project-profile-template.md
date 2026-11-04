@@ -14,7 +14,7 @@ Copy this file to the repository's rules folder, fill every section, date it, ke
 | --- | --- | --- |
 | Repository | | |
 | Profile version and date | | |
-| Standard version adopted | v2.2 | `<dest>/a-plus/VERSION` |
+| Standard version adopted | {{STANDARD_VERSION}} | `<dest>/a-plus/VERSION` |
 | Accountable owners | engineering · security · product · operations (one person may hold several) | |
 | Risk owner for exceptions | | |
 
@@ -66,6 +66,20 @@ Copy this file to the repository's rules folder, fill every section, date it, ke
 
 ## 4. Structure and conventions (C-16, P-M7, P-M8)
 
+| Policy | Selection | Evidence/authorization |
+| --- | --- | --- |
+| Work mode | adopt documents / assess / build / refactor | |
+| Layout policy | {{LAYOUT_POLICY}} | preserve / canonical; explicit target approval |
+| Observability policy | {{OBSERVABILITY_POLICY}} | native / canonical (`07` §4.6) |
+| UI system | | adopted usage/tokens or shadcn/ui proposal; adoption authorization |
+| Product analytics | | disabled / PostHog / approved alternative; purpose and privacy policy |
+| Loaded skill path/version and adopted version | | resolved paths; drift disposition |
+
+For canonical layout, attach the expanded target tree and old → new path map, including
+runtime entrypoints, exact layer names, tests, approved deviations and rollback. Canonical
+observability also binds each applicable coverage row in `07` §4.6; no implicit vendor fallback.
+Record destinations, retention/access, tracing owner, runtime compatibility and delivery evidence.
+
 | Item | Binding |
 | --- | --- |
 | Layout per component (where routes, use cases, domain, adapters, components, tests, scripts live) | |
@@ -83,6 +97,10 @@ Copy this file to the repository's rules folder, fill every section, date it, ke
 | Validation at boundaries (C-02) | |
 | Configuration and secrets | |
 | Logging and error reporting | |
+| Tracing, metrics, Collector and destinations | |
+| Error monitoring and tracing owner (Sentry in canonical mode) | |
+| Product analytics, identity/privacy and flags | |
+| UI primitives, tokens and components.json aliases | |
 | Error registry and mapping | |
 | Data access and migrations | |
 | Server state / caching (clients) | |
@@ -91,18 +109,20 @@ Copy this file to the repository's rules folder, fill every section, date it, ke
 
 ## 5. Applicability register
 
-One row per control family that applies; one row per control that is not applicable, with the
-context fact that rules it out. Controls not listed default to applicable.
+One row per individual control from the adopted catalog, including N/A with its context
+evidence. Never group controls into a single status. Unlisted or unknown controls are gaps.
+The full-refactor evidence ledger follows `08-refactor-workflow.md` §4; generated catalog and
+accounting checks supplement, never replace, runtime checks and review.
 
-| Control id(s) | Applies? | Context fact (for N/A) or binding (for applies) | Evidence command or artefact |
-| --- | --- | --- | --- |
-| C-02 | yes | e.g. pydantic models at the API edge; generated client types + contract check | |
-| C-03 tenant clause, P-S8 | e.g. no | e.g. `users = single-owner` | — |
-| C-10, B-18 | e.g. no | e.g. `exposure = local` (bind address in …) | — |
-| C-14 | | | |
-| C-15, P-O1, P-O2 | yes | | |
-| C-16, P-M7, P-M8 | yes | see §4 | |
-| P-P1 budgets | | see §6 | |
+| Control id | Applies? | Binding or N/A context fact | Status | Implementation | Evidence, revision/environment | Blocker/owner |
+| --- | --- | --- | --- | --- | --- | --- |
+| C-02 | yes | boundary validation | missing | | | |
+| C-15 | yes | failure observability | missing | | | |
+| C-16 | yes | see §4 | missing | | | |
+
+Expand these examples to the entire catalog. Allowed statuses: missing, implemented, verified,
+failed, blocked, not-applicable. A partially satisfied control remains incomplete. Exceptions
+retain an unmet status; a proposed mechanism is not implementation or evidence.
 
 ## 6. Budgets (with method and date)
 

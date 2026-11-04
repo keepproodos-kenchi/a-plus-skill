@@ -10,6 +10,7 @@
 # Usage:
 #   adopt.sh --roles ROLES [--repo DIR] [--dest PATH]
 #            [--agents-file FILE]... [--upgrade] [--dry-run]
+#            [--layout preserve|canonical] [--observability native|canonical]
 #
 # ROLES is a comma list of: service, web, mobile, library, cli, pipeline, ai
 # (backend is accepted for service; --stacks is accepted for --roles). Only the matching
@@ -29,6 +30,8 @@ roles=""
 agents_files=""
 upgrade=0
 dry=0
+layout="preserve"
+observability="native"
 
 die() { echo "adopt: $*" >&2; exit 1; }
 say() { echo "adopt: $*"; }
@@ -50,11 +53,15 @@ while [ $# -gt 0 ]; do
     --agents-file) agents_files="$agents_files ${2:?--agents-file needs a value}"; shift 2 ;;
     --upgrade) upgrade=1; shift ;;
     --dry-run) dry=1; shift ;;
+    --layout) layout="${2:?--layout needs a value}"; shift 2 ;;
+    --observability) observability="${2:?--observability needs a value}"; shift 2 ;;
     -h|--help) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) die "unknown option: $1 (see --help)" ;;
   esac
 done
 
+case "$layout" in preserve|canonical) ;; *) die "invalid --layout: $layout" ;; esac
+case "$observability" in native|canonical) ;; *) die "invalid --observability: $observability" ;; esac
 [ -d "$repo" ] || die "repository directory not found: $repo"
 repo="$(cd "$repo" && pwd)"
 case "$dest" in /*|*..*) die "--dest must be a relative path inside the repository: $dest" ;; esac
@@ -85,6 +92,30 @@ profile="$repo/$dest/a-plus-profile.md"
 [ "$dry" -eq 1 ] && say "dry run: nothing will be written"
 say "repository: $repo"
 say "standard $version -> $dest/a-plus/ (roles: $roles)"
+say "document installation only; no application refactoring or integration is performed"
+
+# Validate owned pointer regions before an upgrade mutates any files.
+if [ -z "$agents_files" ]; then
+  for f in AGENTS.md CLAUDE.md; do
+    [ -f "$repo/$f" ] && agents_files="$agents_files $f"
+  done
+  [ -n "$agents_files" ] || agents_files=" AGENTS.md"
+fi
+END_MARKER="<!-- /a-plus:pointer -->"
+if [ "$upgrade" -eq 1 ]; then
+  for f in $agents_files; do
+    path="$repo/$f"
+    if [ -f "$path" ] && { grep -qF "$MARKER" "$path" || grep -qF "$END_MARKER" "$path"; }; then
+      if ! awk -v start="$MARKER" -v end="$END_MARKER" '
+        $0 == start { starts++; if (state != 0) bad = 1; state = 1 }
+        $0 == end { ends++; if (state != 1) bad = 1; state = 2 }
+        END { if (starts != 1 || ends != 1 || state != 2 || bad) exit 1 }
+      ' "$path"; then
+        die "malformed A+ pointer markers in $f; repair their count/order before upgrade"
+      fi
+    fi
+  done
+fi
 
 # 1. Copy the layers.
 copy_layers=1
@@ -120,15 +151,23 @@ fi
 if [ "$copy_layers" -eq 1 ]; then
   run mkdir -p "$target"
   for f in 01-constitution.md 02-context-risk-and-policies.md 04-project-profile-template.md \
-           05-agent-execution-contract.md 06-stack-bindings.md 07-reference-layouts.md README.md CHANGELOG.md VERSION $playbooks; do
+           05-agent-execution-contract.md 06-stack-bindings.md 07-reference-layouts.md 08-refactor-workflow.md README.md CHANGELOG.md VERSION $playbooks; do
     run cp "$SRC/$f" "$target/$f"
   done
   say "copied layer files"
 fi
 
+# Install the completion-accounting helper with the same versioned standard.
+# Same-version reruns only repair a missing helper, never replace an existing one.
+if [ "$copy_layers" -eq 1 ] || [ ! -f "$target/tools/check-evidence.py" ]; then
+  run mkdir -p "$target/tools"
+  run cp "$SCRIPT_DIR/check-evidence.py" "$target/tools/check-evidence.py"
+fi
+
 # 2. Create the profile if absent.
 if [ -e "$profile" ]; then
   say "profile exists, not touched: $dest/a-plus-profile.md"
+  say "reconcile selected policies and version in the profile explicitly; flags do not overwrite it"
 else
   repo_name="$(basename "$repo")"
   today="$(date +%Y-%m-%d)"
@@ -142,20 +181,15 @@ else
       echo "**Adopted standard:** A+ Engineering Standard $version (\`$dest/a-plus/\`) on $today."
       echo "**Status:** draft — fill every section; until a control has a binding it belongs in Known gaps."
       echo
-      sed '1d' "$SRC/04-project-profile-template.md"
+      sed -e '1d' -e "s/{{STANDARD_VERSION}}/$version/g" \
+        -e "s/{{LAYOUT_POLICY}}/$layout/g" -e "s/{{OBSERVABILITY_POLICY}}/$observability/g" \
+        "$SRC/04-project-profile-template.md"
     } > "$profile"
   fi
   say "created profile: $dest/a-plus-profile.md (draft)"
 fi
 
-# 3. Add the pointer to agent instruction files.
-if [ -z "$agents_files" ]; then
-  for f in AGENTS.md CLAUDE.md; do
-    [ -f "$repo/$f" ] && agents_files="$agents_files $f"
-  done
-  [ -n "$agents_files" ] || agents_files=" AGENTS.md"
-fi
-END_MARKER="<!-- /a-plus:pointer -->"
+# 3. Add the pointer to the preflighted agent instruction files.
 pointer_block() {
   echo "$MARKER"
   echo "## Engineering standard"
@@ -167,6 +201,13 @@ pointer_block() {
   echo "not implemented; do not assume them. Load \`$dest/a-plus/01-constitution.md\`,"
   echo "\`02-context-risk-and-policies.md\`, \`06-stack-bindings.md\` and the playbook for the role you"
   echo "touch as the task requires."
+  echo "For service/web structure, security or observability, read \`$dest/a-plus/07-reference-layouts.md\`."
+  echo "For whole-project A+ refactoring, execute \`$dest/a-plus/08-refactor-workflow.md\`:"
+  echo "bind layout and observability policies, implement and verify each applicable control."
+  echo "Canonical migration follows the authorized target; scoped fixes preserve existing conventions."
+  echo "Document installation, a profile or a gap report is not implementation completion."
+  echo "For a React UI without an adopted design system, propose shadcn/ui (W-26)."
+  echo "Missing, unverified or blocked controls prevent a full A+ claim; honor approvals already given."
   echo "$END_MARKER"
 }
 for f in $agents_files; do
@@ -177,13 +218,22 @@ for f in $agents_files; do
       if [ "$dry" -eq 1 ]; then
         echo "  [dry-run] refresh A+ pointer block in $f"
       else
-        block="$(pointer_block)"
+        # Passing multiline text through awk -v is not portable (notably BSD awk).
+        block_file="$(mktemp "$path.pointer.XXXXXX")"
+        pointer_block > "$block_file"
         tmp="$(mktemp "$path.XXXXXX")"
-        awk -v start="$MARKER" -v end="$END_MARKER" -v block="$block" '
-          $0 == start { print block; skip = 1; next }
+        cp -p "$path" "$tmp"
+        if ! awk -v start="$MARKER" -v end="$END_MARKER" '
+          FNR == NR { block[++count] = $0; next }
+          $0 == start { for (i = 1; i <= count; i++) print block[i]; skip = 1; next }
           skip && $0 == end { skip = 0; next }
           !skip { print }
-        ' "$path" > "$tmp" && mv "$tmp" "$path"
+        ' "$block_file" "$path" > "$tmp"; then
+          rm -f "$block_file" "$tmp"
+          die "could not refresh pointer in $f"
+        fi
+        mv "$tmp" "$path"
+        rm -f "$block_file"
         say "refreshed pointer in $f"
       fi
     else
@@ -202,4 +252,4 @@ for f in $agents_files; do
   say "added pointer to $f"
 done
 
-say "done. Next: fill $dest/a-plus-profile.md (context, stack, commands, structure, applicability, gaps)."
+say "documents installed. Next: fill $dest/a-plus-profile.md; for authorized refactoring execute 08-refactor-workflow.md through implementation and verification."

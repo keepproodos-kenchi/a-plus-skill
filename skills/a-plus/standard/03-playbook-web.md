@@ -65,6 +65,7 @@ Remix, Astro islands) and installable PWAs. Binds to Layer 1 and 2 controls. Row
 | W-19 | | WCAG 2.2 AA: one `h1` per screen, visible focus, labelled inputs, live regions on status, touch targets sized for the device class; automated checks on primary screens, human evidence where P-L1 requires it. |
 | W-20 | | Strings externalised; `locales = many`: parity and growth tested, locale-aware formatting (P-L2). |
 | W-21 | | Design tokens only; dark mode through tokens when supported (P-L3). |
+| W-26 | compatible React/Next.js UI | Inspect actual component usage, tokens and conventions for an adopted design system. If none exists, MUST propose shadcn/ui with integration/dependency costs; implement when authorized, including prior authorization. An installed package alone is not adoption. Keep a verified existing system unless replacement is authorized. Bind one primitive location and token/variant system; verify responsive states, keyboard/focus behavior, accessible validation and representative journeys. |
 
 ## 8. Tests the web client owes
 

@@ -23,13 +23,16 @@ not on its size, its owner's preference or the reviewer's habits. Four rules gov
    recorded as not applicable with the fact that makes it so. A context fact is a claim about
    the system and is reviewable; a false fact is a defect of the highest tier it hides.
 2. **Intent over mechanism.** A control is met when its **intent** holds and its **evidence**
-   exists. Tools, libraries and patterns named in this standard are examples, never
-   requirements. A different mechanism that produces the same evidence meets the control.
+   exists. Tools, libraries and patterns are examples unless the user selects a canonical profile
+   binding (Layer 7). Generic controls accept equivalent evidence; the selected canonical
+   binding additionally fixes its named mechanisms within that scope.
 3. **Native first.** A control is bound with the project's own stack, in this order:
    (a) a mechanism the repository already uses; (b) the framework's built-in facility;
    (c) the language or platform standard library; (d) a dependency already in the lockfile;
    (e) a new dependency, which needs the evidence that (a)–(d) cannot meet the intent and human
-   approval (X-3). Recommending a tool the project does not use, while a native option exists,
+   approval (X-3). An explicitly approved canonical binding selects its named mechanism
+   without requiring proof that all alternatives fail. Record migration costs and compatibility.
+   Outside that selection, recommending a tool the project does not use, while a native option exists,
    is a review defect.
 4. **Designed for the target context.** The profile declares the current context and, when
    known, the target context (for example "loopback today, public next quarter"). Gates check
@@ -54,8 +57,9 @@ not on its size, its owner's preference or the reviewer's habits. Four rules gov
 8. **Smallest complete change.** Code, tests, telemetry, documentation, migration, rollout
    and rollback ship together; nothing is left for "later" without a recorded owner.
 9. **Follow the house style.** The framework's idioms and the repository's established
-   conventions win over this standard's examples. Consistency inside the codebase outranks
-   any external preference.
+   conventions win over this standard's examples for ordinary scoped work. An explicitly
+   authorized canonical migration replaces those conventions with the declared target;
+   framework/runtime compatibility and permission boundaries still apply.
 10. **Design for the weakest device and network you serve.** Budgets come from the supported
     floor, not the developer's machine.
 11. **Independent eyes on risk.** Authors, human or agent, do not approve their own changes to

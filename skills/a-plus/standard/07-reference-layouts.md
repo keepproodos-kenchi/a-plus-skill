@@ -1,13 +1,14 @@
 # Layer 7 — Reference Layouts (FastAPI, Next.js) and Observability
 
-**Status:** Reference v2.3. Distilled from a working, A+-reviewed modular monolith whose
+**Status:** Reference v2.4. Distilled from a working, A+-reviewed modular monolith whose
 structure is enforced by tests, then generalised.
 
 ## 0. How to use this layer
 
 **Strict about properties, flexible about paths.** A+ requires correct ownership, dependency
 direction, runtime isolation, security boundaries and verification. It does not require a
-particular folder name, depth or file template. Each rule below is marked:
+particular folder name, depth or file template in preserve mode. Canonical mode enforces the
+project-specific target expanded from these references. Each rule below is marked:
 
 - **MUST**: an architectural invariant; a violation is a finding (C-16, B-2, B-3, W-1–W-3).
 - **SHOULD**: the recommended default; a documented alternative with the same properties passes.
@@ -15,10 +16,15 @@ particular folder name, depth or file template. Each rule below is marked:
 
 | Id | Rule |
 | --- | --- |
-| R-0a | **Reference, not mandate.** The trees are examples. Reviewers MUST assess properties (responsibilities, imports, runtime and security boundaries, testability, operability), not exact names. A repository's declared structure (profile §4) wins over these trees (rule 4, C-16). |
-| R-0b | **No migration without a demonstrated problem.** Do not recommend renaming or moving files in a passing application unless it fixes a verified defect; any move preserves public import paths, startup, tests, migrations and has a rollback. |
+| R-0a | **Bind the layout policy.** In preserve mode, trees are examples and reviewers assess properties rather than exact names. In authorized canonical mode, expand this layer into the profile's exact target tree and enforce both names/locations and properties (C-16). Record approved deviations; never copy cart-specific filenames into unrelated features. |
+| R-0b | **Authorize migrations.** In preserve mode, do not recommend renaming or moving files in a passing application unless it fixes a verified defect. Explicit canonical migration authorizes moves to the declared target; any move preserves public import paths, startup, tests, migrations and has a rollback. |
 | R-0c | **No empty scaffolding.** A missing optional file or folder is never a finding. Create a layer only when it has a real responsibility. |
 | R-0d | **Classify every structure finding** (05 §5 `Class`): *verified defect* (evidence shows a broken invariant), *risk requiring evidence* (name the check that would settle it), *optional improvement*, or *acceptable alternative* (record it in the profile, not as a finding). |
+
+**Canonical selection:** layout and observability are independent profile policies. An exact-layout
+request selects canonical layout; an approved named telemetry stack selects §4.6. Canonical
+mode preserves framework conventions and creates only layers with real responsibilities.
+Refactor execution and completion are defined in `08-refactor-workflow.md`.
 
 Placeholders: `<package>` is the Python import package (for example `shop`); `<feature>` a
 business capability (`orders`, `billing`), never a technical layer; `<namespace>` an optional
@@ -338,7 +344,9 @@ policy while keeping server credentials and browser-only dependencies in their o
 ## 4. Observability reference
 
 Binds C-15, P-O1–P-O7, B-8, B-22–B-24, W-10, W-13. Require correlated, privacy-safe,
-actionable telemetry with a verified destination; never a particular vendor.
+actionable telemetry with a verified destination. Native mode accepts equivalent mechanisms;
+canonical observability selects the required bindings in §4.6 and their evidence. The MAY
+vendor choices in the following reference table apply to native mode.
 
 | Signal | FastAPI | Next.js | Contract |
 | --- | --- | --- | --- |
@@ -361,6 +369,7 @@ actionable telemetry with a verified destination; never a particular vendor.
 | `logging.py` | JSON records (UTC timestamp, severity, event code, service identity, request and trace ids) through a bounded queue and one writer; library loggers routed through the same allow-list. |
 | `metrics.py`, `tracing.py` | Explicit histogram buckets, bounded attribute keys, sampling; OTLP export only with a destination. |
 | `safety.py` | Wraps SDK and sink calls: failures count as drops and never fail the request or log the original exception. |
+| `sentry.py` | Canonical mode: Sentry initialization, scrubbing, release/environment metadata and one exception capture path; native mode when selected. |
 | `health.py` | Liveness (process only) and readiness (bounded, read-only checks of required dependencies; 503 on failure). |
 
 Tests: a fixture secret in every field never reaches a sink; a full queue drops and counts
@@ -381,11 +390,12 @@ downstream call; readiness 503 when a required store fails; stream cancellation 
 
 ### 4.3 Product analytics (MAY)
 
-Behavioural analytics (for example PostHog) is not operational telemetry. When used, it lives
-in `platform/analytics/` (`client.ts`, `server.ts`, `events.ts` vocabulary, `privacy.ts`
-consent and scrubbing, `feature-flags.ts`), separate from `platform/observability/`; features
+Behavioural analytics is separate from operational telemetry. Canonical mode uses PostHog
+when product analytics is enabled; native mode may bind another existing mechanism. When used, it lives
+in `platform/analytics/` (`client.ts`, `server.ts`, `events.ts` vocabulary, `identity.ts`
+identification/logout reset, `privacy.ts` collection policy and scrubbing, `feature-flags.ts`), separate from `platform/observability/`; features
 call its facade, never the SDK. Consent gates collection where P-S/C-05 require it; flags
-never authorise (R-N8). Adding a vendor follows the ladder and needs approval.
+never authorise (R-N8). Adding a vendor follows the selected profile and authorization already given (X-3, X-11).
 
 ### 4.4 Rules (both stacks)
 
@@ -418,6 +428,131 @@ tests) → **2 production baseline** (verified destination, retention and access
 dashboards, actionable alerts with runbooks, pipeline self-monitoring) → **3 advanced** (SLIs
 and SLOs per P-O5, sampling and cost tuning, profiling, incident drills).
 
+### 4.6 Canonical FastAPI + Next.js observability
+
+Applies when the project selects `observability = canonical`; ordinary/native profiles retain
+§4's mechanism flexibility. Binding this stack is distinct from installing dependencies or
+sending telemetry: honor the task's existing authorization and report unresolved external
+requirements. Do not downgrade missing credentials or destinations to N/A.
+
+| Id | Level | Rule |
+| --- | --- | --- |
+| R-C1 | MUST | Account for every applicable row of the coverage matrix below with owner, signal, implementation, verification and destination. N/A needs a context fact. |
+| R-C2 | MUST | Implement the named technology bindings below with compatible versions; substitutions require an explicit profile decision. A package entry or empty module is not integration. |
+| R-C3 | MUST | Wire platform facades into real entrypoints and workflows, initialize once per runtime, and designate one tracing owner and one intended exception capture path. |
+| R-C4 | MUST | Verify delivery to configured log/trace/metric backends and Sentry, retention/access policy and applicable alert routing. Collector presence alone is incomplete. |
+| R-C5 | MUST | When analytics is enabled, use PostHog with explicit identity/logout, curated events, privacy and flag failure policies. Keep product events, diagnostic signals and durable audits separate. |
+| R-C6 | MUST | Run the acceptance scenarios below, including redaction, bounded cardinality, stream cleanup and telemetry-outage isolation. Record missing external evidence as blocked. |
+
+#### Coverage matrix
+
+Every applicable row requires implementation and verification evidence. Absent capabilities such as SSE are N/A with evidence; unsupported host measurements are explicitly blocked or mapped to the hosting provider's telemetry, never fabricated.
+
+| Area | FastAPI | Next.js |
+| --- | --- | --- |
+| HTTP | Request rate, duration histograms, errors and outcomes | Server requests, route handlers and actions; browser API outcomes separately |
+| Database | Query latency, failures, pool saturation where relevant | Backend API calls; direct DB measurements only where Next.js owns persistence |
+| Authentication | Authentication and authorization failures | Login, refresh and session failures; no credential or token capture |
+| Business workflows | Task execution, approvals, completion/failure and duration | User interaction failures and workflow outcomes; authoritative checkout completion from its backend owner |
+| External services | Actual integrations, e.g. Hermes when present | FastAPI and actual external API calls; timeouts/retries/outcomes |
+| Streaming | SSE open, first event, duration, disconnect reason, cancellation and cleanup | Streaming response lifecycle and client disconnect/cancellation; reconnections when used |
+| Runtime | CPU, memory, worker/process health and queue depth where present | Node.js memory, CPU/event-loop health and hosting health; runtime-appropriate equivalents for Edge/serverless |
+| Frontend UX | N/A | Web Vitals and client errors with a verified destination |
+
+Hermes is an example integration name, not a dependency that every project must acquire. Streaming cancellations and authorization denials need meaningful outcomes rather than being indiscriminately reported as unexpected exceptions.
+
+#### Required technology bindings
+
+| Layer | Binding and responsibility |
+| --- | --- |
+| Logging format | Structured JSON with allow-listed event fields, timestamp, severity, service/version/environment and request/trace correlation where available |
+| Python logging | Standard-library logging with JSON formatting and bounded delivery |
+| Node.js logging | Pino behind the server logger facade; browser/Edge use runtime-compatible facades |
+| Instrumentation | OpenTelemetry for applicable server spans; one designated tracing owner per runtime |
+| Trace propagation | W3C Trace Context: traceparent and tracestate on trusted, configured hops; browser cross-origin propagation requires destination and CORS configuration |
+| Metrics | OpenTelemetry server metrics with bounded labels and explicit histogram units/buckets |
+| Collection | OpenTelemetry Collector with configured receivers, processors, exporters, resource limits and health |
+| Error monitoring | Sentry for scrubbed client/server exceptions, release association, private source-map handling where used, and tested issue/alert delivery |
+| Product analytics | PostHog when product analytics is enabled; separate identity, privacy and feature-flag policies |
+| Storage/query | Profile MUST name a backend for logs, traces and metrics, retention, access controls and operational ownership; Collector installation alone is incomplete |
+
+Use a single explicit JSON log ingestion path: stdout/file collection or a tested log bridge. Do not assume Pino/Python output reaches the Collector automatically. OpenTelemetry traces/metrics go through the Collector to selected backends; scrubbed Sentry errors go through its supported SDK transport. PostHog uses its analytics transport. Document intentional overlap and avoid duplicate spans, exception capture, event listeners and analytics events.
+
+Check the installed browser OpenTelemetry support status (the linked documentation currently labels it experimental); do not impose the complete Node SDK stack on browsers. Capture browser errors and Web Vitals through a version-supported Sentry/Next.js integration and verify any required browser-to-server trace continuity. Select compatible Sentry/OpenTelemetry versions and the documented integration mode; neither SDK may independently register a competing tracing pipeline.
+
+Sources: [OpenTelemetry JavaScript status](https://opentelemetry.io/docs/languages/js/), [Collector](https://opentelemetry.io/docs/collector/), [W3C Trace Context](https://www.w3.org/TR/trace-context/), [Pino](https://getpino.io/), [Sentry OpenTelemetry integration](https://docs.sentry.io/platforms/javascript/guides/nextjs/opentelemetry/).
+
+#### Runtime module ownership
+
+Roots are resolved from the selected project profile: apps/api and apps/web below are examples; api and frontend are equally valid roots. The Python package name is project-specific.
+
+```text
+apps/api/src/<package>/platform/observability/
+├── __init__.py           # feature-facing facade
+├── setup.py              # lifecycle, providers and exporter configuration
+├── logging.py            # structured Python logging
+├── context.py            # request/trace context
+├── middleware.py         # HTTP and stream lifecycle instrumentation
+├── tracing.py            # spans and propagation
+├── metrics.py            # instruments and bounded attributes
+├── health.py             # liveness/readiness helpers
+├── sentry.py             # SDK setup, scrubbing and exception ownership
+├── events.py             # finite event vocabulary and field allowlists
+└── safety.py             # bounded telemetry failure handling
+
+apps/web/src/
+├── instrumentation.ts            # delegates initialization by runtime
+├── instrumentation-client.ts     # delegates browser initialization, version permitting
+└── platform/
+    ├── observability/
+    │   ├── server/
+    │   │   ├── setup.ts           # one initialization path
+    │   │   ├── logger.ts          # Pino
+    │   │   ├── context.ts
+    │   │   ├── tracing.ts
+    │   │   ├── metrics.ts
+    │   │   ├── health.ts
+    │   │   └── sentry.ts
+    │   ├── client/
+    │   │   ├── logger.ts          # scrubbed browser event facade
+    │   │   ├── errors.ts          # error capture ownership/deduplication
+    │   │   ├── sentry.ts
+    │   │   └── web-vitals.ts
+    │   └── shared/
+    │       ├── events.ts
+    │       ├── types.ts
+    │       └── privacy.ts         # pure allowlists/redaction helpers
+    └── analytics/
+        ├── client.ts
+        ├── server.ts
+        ├── events.ts
+        ├── identity.ts
+        ├── privacy.ts
+        └── feature-flags.ts
+```
+
+Keep framework-required Sentry/Next.js hooks and build configuration in their supported locations, delegating reusable policy to the modules above. Add an Edge-specific entrypoint only when the deployment actually uses Edge; it must not import Pino/Node-only modules. Health modules need real probe wiring. Instrumentation entrypoints must initialize the integrations exactly once. Feature workflow events are emitted from the owning feature through platform facades.
+
+The analytics layout applies when PostHog is enabled. identity.ts owns anonymous-to-authenticated transitions and logout reset; server identity comes from verified session context, not untrusted client assertions. privacy.ts owns the configured collection policy, consent gating where required, field scrubbing and retention-related configuration. Use curated events by default; autocapture and replay require an explicit reviewed configuration. Feature flags have bounded failure defaults and never authorize access. Sentry owns exception tracking by default; do not also enable PostHog exception capture without an explicit reason. Operational workflow events, product events and durable audit records remain separate contracts.
+
+Reference: [PostHog Next.js integration](https://posthog.com/docs/libraries/next-js).
+
+#### Acceptance evidence
+
+- Exercise a real frontend → API workflow; query the destination for correlated events and
+  spans. Request IDs and trace IDs are distinct; neither is an authorization credential.
+- Inject fixture secrets into errors, URLs, headers and payloads; prove absence from logs,
+  traces, Sentry breadcrumbs/events and analytics. Use bounded metric labels, never user,
+  entity or request identifiers, raw URLs, query text or exception messages.
+- Produce a controlled exception and verify intended capture count, release/environment and
+  issue delivery. Verify alert routing where the failure's detection policy requires it.
+- Test stream cancellation/cleanup, repeated initialization, bounded flush and exporter/sink
+  outages. Business requests keep their specified behavior; drops remain observable.
+- Where PostHog is enabled, verify configured consent/privacy behavior, identity transitions
+  and logout reset, event deduplication, backend-authoritative completion and flag failures.
+- Verify CPU/memory/worker or hosting metrics at their actual source. Unsupported probes need
+  a documented provider equivalent or explicit gap, never a fabricated measurement.
+
 ## 5. Review checklist
 
 - [ ] Findings are classified (R-0d); no finding cites a folder name alone; acceptable alternatives are recorded in the profile.
@@ -431,6 +566,8 @@ and SLOs per P-O5, sampling and cost tuning, profiling, incident drills).
 - [ ] Logs are JSON, allow-listed and correlated; request id echoed on every response and present in browser error events; one primary error pipeline.
 - [ ] Metric labels bounded; telemetry outage does not fail requests; drops visible; liveness and readiness tested with dependency failures.
 - [ ] The telemetry destination is stated honestly and verified by a query.
+- [ ] Layout and observability policies are bound separately; canonical targets and R-C1–R-C6 are checked when selected.
+- [ ] UI system adoption is evidenced or shadcn/ui is proposed under W-26; authorized adoption is tested on real screens.
 
 ## 6. Framework references
 

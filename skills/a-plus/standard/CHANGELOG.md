@@ -1,5 +1,30 @@
 # Changelog — A+ Engineering Standard
 
+## 2.4.0 — 2026-11-04
+
+Adds an explicit implementation workflow for authorized whole-project A+ refactoring.
+Ordinary build/review tasks stay scoped; existing applications do not migrate silently.
+
+- `SKILL.md` routes full refactors to new `08-refactor-workflow.md`, requires relevant Layer 7
+  reads, distinguishes document adoption from implementation, and honors prior authorization.
+- Canonical layout and canonical observability are separate profile policies. Approved
+  canonical selections override preservation/native defaults within scope; generic controls
+  retain equivalent-mechanism support. Record exact targets, mappings, deviations and rollback.
+- New W-26 requires proposing shadcn/ui for compatible React UIs without an adopted system;
+  authorized adoption includes tokens, primitives and real-screen verification.
+- Canonical R-C1–R-C6 bind coverage and verification for JSON/Python logging/Pino,
+  OpenTelemetry/W3C propagation, metrics, Collector, Sentry and PostHog when analytics is
+  enabled. Includes runtime module ownership, backend destinations and acceptance scenarios.
+- Individual control accounting distinguishes implementation from verification and blocks
+  full-conformance claims on unmet controls, missing external evidence or temporary exceptions.
+- `adopt.sh` installs the workflow and accounting helper, supports explicit layout/observability
+  selections for new profiles, stamps the actual version, and preserves existing profiles.
+- New standard-library evidence checker validates catalog coverage, statuses, artifact hashes,
+  local paths and revision metadata. It does not execute ledger commands or certify claims.
+- Adoption/evidence regression tests and a local gate cover failure paths and preservation.
+- Upgrade pointer refresh is portable to BSD awk, propagates failures and rejects malformed
+  marker regions before mutation to preserve owner instructions.
+
 ## 2.3.0 — 2026-11-04
 
 Expands the FastAPI and Next.js feature layouts and clarifies their runtime and ownership

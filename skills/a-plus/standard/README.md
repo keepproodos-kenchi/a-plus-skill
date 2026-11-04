@@ -1,4 +1,4 @@
-# A+ Engineering Standard (generic, v2.2)
+# A+ Engineering Standard (generic, v2.4)
 
 A stack-agnostic standard for building and reviewing production-ready, enterprise-grade
 software (services, web and mobile clients, libraries and CLIs, pipelines and AI features)
@@ -18,8 +18,10 @@ apply, and the project's own stack decides how each is met.
 | `03-playbook-service.md`, `03-playbook-web.md`, `03-playbook-mobile.md`, `03-playbook-library-cli.md`, `03-playbook-pipeline-ai.md` | 3. Role mechanics `B-`, `W-`, `M-`, `L-`, `J-`/`AI-` | No (keep only the roles you have) |
 | `04-project-profile-template.md` | 4. Template for the project profile | **Copy and fill** |
 | `05-agent-execution-contract.md` | 5. Agent rules `X-1`…`X-12`, brief, report, gap and finding formats, reviewer checklist | No |
-| `06-stack-bindings.md` | 6. Example native bindings per ecosystem (examples, never requirements) | No |
-| `07-reference-layouts.md` | 7. Reference FastAPI and Next.js trees, architecture tests, observability layout (reference, not mandate) | No |
+| `06-stack-bindings.md` | 6. Native bindings; approved canonical selections follow Layer 7 | No |
+| `07-reference-layouts.md` | 7. Preserve/canonical layouts, architecture checks and native/canonical observability | No |
+| `08-refactor-workflow.md` | Whole-project implementation, control evidence and completion gates | No |
+| `tools/check-evidence.py` | Installed completion-accounting helper; not an architecture or security checker | No |
 
 Change log: `CHANGELOG.md`. Version: `VERSION`.
 
@@ -36,6 +38,14 @@ Change log: `CHANGELOG.md`. Version: `VERSION`.
    - risk-relevant budgets, exemplars, known gaps in the gap format, agent bindings.
 3. **Point agents at it** from `AGENTS.md` / `CLAUDE.md`.
 4. **Wire one gate command** that runs the profile's merge rows, in CI when a remote exists.
+
+## Whole-project refactoring
+
+Explicitly request **Refactor to A+** and select `layout = canonical` when exact structural
+migration is intended. Select `observability = canonical` separately for the FastAPI/Next.js
+stack in `07` §4.6. Execute `08-refactor-workflow.md` through implementation and verification;
+installing these documents is only setup. Existing profiles are preserved on upgrade: reconcile
+new policies and controls explicitly. Ordinary scoped tasks preserve verified house style.
 
 ## Use it on every change
 
@@ -55,5 +65,6 @@ Change log: `CHANGELOG.md`. Version: `VERSION`.
 
 - If you cannot tell whether an applicable control is met, it is not met. Add the test, check
   or measurement that settles it.
-- If a recommendation names a tool the project does not already use, first show why every
-  native option fails.
+- Outside an explicitly approved canonical binding, a new tool follows the native-first ladder.
+- Full-refactor completion requires verified individual controls; blocked external evidence
+  remains a gap even when local checks pass.

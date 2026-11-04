@@ -1,10 +1,12 @@
 # Layer 6 — Example Bindings by Ecosystem
 
-**Status:** Reference v2.0. **Examples, not requirements.** This layer helps an agent find the
+**Status:** Reference v2.0. **Native defaults; canonical bindings are explicit selections.** This layer helps an agent find the
 native way to meet a control. Always apply the ladder (Layer 1 §1.3, X-11): first look for what
 the repository already uses (manifests, lockfiles, existing modules); only then consult these
 tables; anything not already in the lockfile needs approval. When the repository already has a
-working mechanism for a concern, that mechanism is the binding, even if it is not listed here.
+working mechanism for a concern, that mechanism is the binding unless an approved canonical
+profile selects its replacement. FastAPI/Next.js canonical observability is defined once in
+`07-reference-layouts.md` §4.6; use that binding instead of treating this table as a vendor veto.
 
 ## How to read the tables
 
